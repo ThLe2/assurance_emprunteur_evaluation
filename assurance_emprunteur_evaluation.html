@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Évaluation globale — Les assurances emprunteurs</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16243B; --blue:#1F4E79; --blue-2:#2E75B6; --paper:#F5F2EB;
+    --card:#FFFFFF; --ink:#1d2733; --muted:#5d6b7a; --line:#e3ddd0; --gold:#B08D57;
+    --ok:#2F7A4F; --ok-bg:#EAF4ED; --ko:#B23B3B; --ko-bg:#FAEDED;
+    --amber:#B5852A; --amber-bg:#FBF1DC;
+    --shadow:0 1px 2px rgba(22,36,59,.05),0 8px 24px rgba(22,36,59,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Karla',-apple-system,system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:28px 20px 64px}
+  .card-main{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .header{background:var(--navy);color:#fff;padding:30px 34px}
+  .chapter-tag{display:inline-block;background:rgba(255,255,255,.14);color:#e9eef6;padding:5px 13px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+  .chapter-tag span{color:var(--gold)}
+  .header h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:clamp(23px,4.2vw,33px);line-height:1.14;letter-spacing:-.01em;margin-bottom:8px}
+  .header p{font-size:14px;color:#b9c4d4}
+  .gold-rule{height:3px;width:60px;background:var(--gold);border:0;margin:16px 0 0}
+  .body{padding:30px 34px}
+  .identity{text-align:center;padding:14px 0}
+  .identity h2{font-family:'Fraunces',serif;font-weight:600;font-size:21px;color:var(--navy);margin-bottom:8px}
+  .identity p.sub{color:var(--muted);margin-bottom:26px;font-size:14.5px}
+  .form-group{margin-bottom:16px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto}
+  .form-group label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;letter-spacing:.02em}
+  .form-group input{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:9px;font-size:15px;font-family:'Karla',sans-serif;transition:border-color .2s;background:#fdfcf9}
+  .form-group input:focus{outline:none;border-color:var(--blue-2)}
+  .btn{cursor:pointer;font-family:'Karla',sans-serif;font-weight:700;font-size:15px;letter-spacing:.03em;border-radius:10px;transition:transform .12s,box-shadow .15s,filter .15s,background .15s}
+  .btn-primary{background:var(--blue);color:#fff;border:none;padding:13px 34px;margin:6px}
+  .btn-primary:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(31,78,121,.28)}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
+  .btn-gold{background:var(--gold);color:var(--navy)}
+  .btn-gold:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-2px)}
+  .btn-secondary{background:#fff;color:var(--blue);border:1.5px solid var(--blue);padding:11px 28px;margin:6px}
+  .btn-secondary:hover:not(:disabled){background:#f0f4f9}
+  .btn-secondary:disabled{opacity:.4;cursor:not-allowed;border-color:#bbb;color:#bbb}
+  .stagiaire-bar{background:#efeadf;padding:11px 34px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .stagiaire-bar strong{color:var(--navy)}
+  .consigne{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13.5px;line-height:1.5;color:#3a4654}
+  .consigne b{color:var(--navy)}
+  .meta{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .progress{flex:1;min-width:180px}
+  .progress .track{height:8px;background:#e6e0d3;border-radius:99px;overflow:hidden}
+  .progress .fill{height:100%;width:0;background:var(--blue-2);border-radius:99px;transition:width .4s cubic-bezier(.2,.7,.2,1)}
+  .progress .plabel{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .scorepill{font-family:'Fraunces',serif;font-weight:600;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:99px;padding:7px 15px;font-size:14.5px}
+  .scorepill b{color:var(--blue);font-size:17px}
+  .cq{background:#fff;border:1px solid var(--line);border-radius:11px;padding:16px 18px;margin-bottom:13px;box-shadow:var(--shadow)}
+  .cq .ask{font-weight:600;font-size:15px;color:var(--ink);margin-bottom:10px;display:flex;gap:10px;align-items:flex-start}
+  .cq .ask .qn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .theme-tag{display:inline-block;background:#eef3f9;color:var(--blue);font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-left:8px;letter-spacing:.02em;vertical-align:middle;white-space:nowrap}
+  .multi-tag{display:inline-block;background:#fbf1dc;color:var(--amber);font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.02em;vertical-align:middle;white-space:nowrap}
+  select.cs{width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font-size:14.5px;font-family:'Karla',sans-serif;background:#fdfcf9;color:var(--ink);cursor:pointer;transition:border-color .15s}
+  select.cs:focus{outline:none;border-color:var(--blue-2)}
+  select.cs:disabled{cursor:default;opacity:1}
+  select.cs.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+  select.cs.ko{border-color:var(--ko);background:var(--ko-bg);color:var(--ko)}
+  .checks{display:flex;flex-direction:column;gap:8px}
+  .checks label{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:9px;padding:10px 13px;background:#fdfcf9;cursor:pointer;font-size:14.5px;transition:.15s}
+  .checks label:hover{border-color:var(--blue-2)}
+  .checks label.ok{border-color:var(--ok);background:var(--ok-bg)}
+  .checks label.ko{border-color:var(--ko);background:var(--ko-bg)}
+  .checks input{margin-top:3px}
+  .open-tag{display:inline-block;background:#eaf4ed;color:var(--ok);font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px;margin-left:6px;letter-spacing:.02em;vertical-align:middle;white-space:nowrap}
+  textarea.oa{width:100%;min-height:96px;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font-size:14.5px;font-family:'Karla',sans-serif;background:#fdfcf9;color:var(--ink);resize:vertical;line-height:1.5}
+  textarea.oa:focus{outline:none;border-color:var(--blue-2)}
+  textarea.oa:disabled{cursor:default;opacity:1;background:#f7f5ef;border-color:var(--gold)}
+  .oa-hint{font-size:11.5px;color:var(--muted);margin-top:5px;font-style:italic}
+  .model{background:#f7f5ef;border:1px solid var(--gold);border-radius:9px;padding:13px 15px;margin-top:11px}
+  .model h5{margin:0 0 7px;font-family:'Fraunces',Georgia,serif;font-size:14px;color:var(--navy)}
+  .model p{margin:0 0 7px;font-size:13.5px;line-height:1.55}
+  .model ul{margin:6px 0 0;padding-left:17px;font-size:13px}
+  .model li{margin-bottom:3px}
+  .model .ref{color:var(--gold);font-weight:700;font-size:11.5px}
+  .model .note{font-size:12px;color:var(--muted);font-style:italic;margin-top:8px;padding-top:7px;border-top:1px dashed var(--line)}
+  .pass-banner{border-radius:10px;padding:15px 18px;margin:14px 0 4px;font-size:14.5px;line-height:1.55}
+  .pass-banner.ok{background:var(--ok-bg);border:1.5px solid var(--ok);color:#1f5c39}
+  .pass-banner.ko{background:var(--amber-bg);border:1.5px solid var(--amber);color:#8a6420}
+  .pass-banner b{display:block;font-family:'Fraunces',Georgia,serif;font-size:16px;margin-bottom:5px}
+  .cfb{max-height:0;overflow:hidden;opacity:0;transition:max-height .4s,opacity .35s;font-size:13px;border-left:3px solid var(--line);padding-left:14px}
+  .cfb.show{max-height:320px;opacity:1;margin-top:12px}
+  .cfb.good{border-color:var(--ok);color:#1c5234} .cfb.bad{border-color:var(--ko);color:#7a2222}
+  .cfb .vd{font-weight:700}
+  .cfb .ref{display:inline-block;margin-top:6px;font-size:12px;color:var(--blue);background:#eef3f9;border-radius:6px;padding:2px 8px;font-weight:600}
+  .actions{margin-top:24px;text-align:center}
+  .result-screen{text-align:center;padding:20px 0}
+  .score-circle{width:132px;height:132px;border-radius:50%;margin:0 auto 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 24px rgba(22,36,59,.18)}
+  .score-circle.excellent{background:var(--ok)} .score-circle.good{background:var(--blue)}
+  .score-circle.average{background:var(--amber)} .score-circle.poor{background:var(--ko)}
+  .score-circle .sv{font-family:'Fraunces',serif;font-size:30px;font-weight:600}
+  .score-circle .sl{font-size:12px;opacity:.95;margin-top:2px;letter-spacing:.05em}
+  .result-msg{font-family:'Fraunces',serif;font-size:21px;font-weight:600;margin-bottom:8px;color:var(--navy)}
+  .result-detail{color:var(--muted);font-size:14px;margin-bottom:20px;max-width:56ch;margin-left:auto;margin-right:auto}
+  .recap{text-align:left;max-width:600px;margin:0 auto 8px}
+  .recap h4{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--navy);margin-bottom:6px}
+  .recap-row{display:flex;align-items:center;gap:11px;padding:9px 4px;border-bottom:1px solid var(--line);font-size:13.5px}
+  .recap-row .dot{flex:none;width:11px;height:11px;border-radius:50%}
+  .recap-row .lab{flex:1;color:var(--ink)}
+  .recap-row .sc{font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+  .recap-row .hint{flex-basis:100%;font-size:12px;color:var(--blue);padding-left:22px}
+  .pdf-info{background:var(--amber-bg);border-left:4px solid var(--amber);padding:12px 16px;border-radius:8px;text-align:left;font-size:13px;color:#6d4c00;margin:18px 0}
+  .pdf-info strong{display:block;margin-bottom:4px}
+  .note{background:#eef3f9;border-left:4px solid var(--blue-2);padding:12px 16px;border-radius:8px;text-align:left;font-size:13px;color:var(--blue);margin:16px 0;line-height:1.5}
+  footer{margin-top:26px;text-align:center;font-size:12px;color:#9a9384;letter-spacing:.04em}
+</style>
+
+<style>body{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+textarea,input{-webkit-user-select:text;-moz-user-select:text;user-select:text}</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card-main">
+    <div class="header">
+      <div class="chapter-tag">IOBSP Niveau 2 · Journée 10 <span>/</span> Les assurances emprunteurs — Évaluation globale</div>
+      <h1>Évaluation globale — Les assurances emprunteurs</h1>
+      <p>40 questions · 22 à choix + 18 ouvertes (format examen) · environ 1 h 30 · seuil de réussite 70 %</p>
+      <hr class="gold-rule">
+    </div>
+
+    <div id="screen-identity" class="body">
+      <div class="identity">
+        <h2>Avant de commencer</h2>
+        <p class="sub">Renseignez vos informations pour personnaliser votre attestation de réussite.</p>
+        <div class="form-group"><label for="nom">Nom</label><input type="text" id="nom" placeholder="Votre nom de famille" autocomplete="family-name"></div>
+        <div class="form-group"><label for="prenom">Prénom</label><input type="text" id="prenom" placeholder="Votre prénom" autocomplete="given-name"></div>
+        <button class="btn btn-primary" id="btn-start" disabled onclick="startQuiz()">Commencer l'évaluation</button>
+      </div>
+    </div>
+
+    <div id="screen-quiz" style="display:none;">
+      <div class="stagiaire-bar"><span>Stagiaire&nbsp;: <strong id="stagiaire-name"></strong></span><span id="date-quiz"></span></div>
+      <div class="body">
+        <div class="consigne"><b>🎯 Évaluation globale — Journée 10, les assurances emprunteurs.</b> 40 questions couvrant les six modules : <b>22 questions à choix</b> et <b>18 questions ouvertes</b> rédigées, au format de l'épreuve.<br><br>Le pourcentage affiché en fin d'évaluation est calculé sur les <b>22 questions à choix</b>. Les questions ouvertes ne sont pas notées automatiquement : la réponse attendue et les points de correction s'affichent à la validation, et votre rédaction est reproduite dans l'attestation pour relecture par votre formateur.<br><br><b>Format de l'épreuve réelle :</b> <b>55 questions de type QCM</b> et <b>45 questions ouvertes</b>. <b>70 % de réussite</b> sont exigés pour obtenir l'examen.<br><br>Copier-coller désactivé. Prenez votre temps : cette évaluation demande environ 1 h 30.</div>
+        <div class="meta">
+          <div class="progress"><div class="track"><div class="fill" id="fill"></div></div><div class="plabel" id="plabel">0 / 40 répondu</div></div>
+          <div class="scorepill">Score&nbsp;: <b id="score">—</b> / 22</div>
+        </div>
+        <div id="qcm"></div>
+        <div class="actions"><button class="btn btn-primary" id="btn-validate" disabled onclick="validateQuiz()">Validation et génération du PDF</button></div>
+      </div>
+    </div>
+
+    <div id="screen-result" style="display:none;">
+      <div class="stagiaire-bar"><span>Stagiaire&nbsp;: <strong id="stagiaire-name-2"></strong></span><span id="date-quiz-2"></span></div>
+      <div class="body">
+        <div class="result-screen">
+          <div class="score-circle" id="score-circle"><div class="sv" id="score-value">0/22</div><div class="sl" id="score-label">questions</div></div>
+          <div class="result-msg" id="result-message"></div>
+          <div id="pass-banner" style="display:none;"></div>
+          <div class="result-detail" id="result-detail"></div>
+          <div class="recap" id="recap-block"><h4>Bilan par thème</h4><div id="recap-list"></div></div>
+          <div class="note" id="note-pdf" style="display:none;"></div>
+          <div class="actions">
+            <button class="btn btn-secondary" id="btn-restart" onclick="restartQuiz()">↻ Refaire l'évaluation</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>TMK Performances - N° Siret : 49841924100027 - Code NAF : 8559A</footer>
+  </div>
+</div>
+
+<script>
+const CFG = {"THEME_INFO": {"A": {"label": "M1 — Rôle et quotités"}, "B": {"label": "M2 — Garanties et exclusions"}, "C": {"label": "M3 — Groupe ou individuel"}, "D": {"label": "M4 — Le libre choix"}, "E": {"label": "M5 — L'équivalence de garanties"}, "F": {"label": "M6 — La tarification du risque"}}, "THEME_ORDER": ["A", "B", "C", "D", "E", "F"], "QUESTIONS": [{"th": "A", "kind": "qcm", "ask": "Un client célibataire emprunte seul et son conseiller retient une quotité de 100 %. Que signifie ce chiffre ?", "options": ["L'assurance couvre la totalité du capital restant dû", "Il ne pourra pas déléguer son assurance", "La prime représente 100 % du coût du crédit", "La couverture est plafonnée à 100 000 €"], "correct": [0], "multi": false, "expl": "Sur un emprunteur seul, 100 % est la couverture entière. La quotité est un pourcentage de CAPITAL COUVERT, pas une part du coût du crédit.", "ref": "notion de quotité"}, {"th": "A", "kind": "qcm", "ask": "Un couple demande une quotité 60/40. Le conseiller répond que seules les formules 50/50 et 100/100 existent. Que penser de cette réponse ?", "options": ["Elle dépend de l'assureur retenu", "Elle est exacte, ce sont les deux seules formules possibles", "Elle est exacte pour un prêt immobilier", "Elle est fausse : la quotité se répartit librement, dans la limite de 200 % au total"], "correct": [3], "multi": false, "expl": "La répartition est libre sous réserve des exigences du prêteur. Beaucoup de couples découvrent trop tard qu'un dosage intermédiaire était possible.", "ref": "notion de quotité"}, {"th": "A", "kind": "qcm", "ask": "Un client souscrit une garantie perte d'emploi facultative. Entre-t-elle dans le TAEG ?", "options": ["Oui, toute assurance liée au prêt y entre", "Non : elle ne conditionne pas l'octroi du crédit", "Non, aucune assurance n'entre dans le TAEG", "Oui, si elle est souscrite auprès du prêteur"], "correct": [1], "multi": false, "expl": "Le critère du TAEG est unique — tout ce qui CONDITIONNE L'OCTROI. Une garantie facultative en est exclue, alors que l'assurance décès-invalidité exigée par le prêteur y entre.", "ref": "rappel J6 · critère du TAEG"}, {"th": "A", "kind": "qcm", "ask": "Prêt de 180 000 €, assurance à 0,28 % du capital initial, quotité 100 sur chacune des deux têtes d'un couple. Quelle est la prime annuelle totale ?", "options": ["504 €", "252 €", "1 008 €", "2 016 €"], "correct": [2], "multi": false, "expl": "0,28 % de 180 000 € = 504 € par tête et par an. En 100/100, la couverture porte deux fois sur le capital entier : 1 008 € par an, soit 20 160 € sur vingt ans.", "ref": "calcul de prime"}, {"th": "A", "kind": "open", "ask": "Un couple aux revenus quasi identiques, sans enfant, emprunte sur 10 ans. Faut-il en conclure qu'une quotité 100/100 s'impose ? Justifiez votre réponse.", "model": "Non, et c'est justement ce que la règle d'arbitrage ne dit pas. Les trois questions que l'on pose à un couple servent à éclairer une décision, pas à produire une réponse automatique. Ici, les revenus sont comparables : le risque est donc symétrique, et la disparition de l'un ne laisse pas l'autre dans une situation sans commune mesure avec la précédente. Il n'y a pas d'enfant à charge, donc pas de charge supplémentaire à absorber en cas de coup dur. La durée est courte, ce qui signifie que le capital restant dû décroît vite et que la période d'exposition est brève. Ces trois éléments plaident pour une couverture plus légère qu'un 100/100, et une répartition intermédiaire mérite d'être chiffrée. Mais je ne décide pas à leur place : je leur présente les deux chiffres, le surcoût d'un côté et le reste à charge de l'autre, et je les laisse arbitrer.", "points": ["La règle d'orientation n'est pas un automatisme", "Revenus comparables : le risque est symétrique", "Pas d'enfant à charge : pas de charge supplémentaire à absorber", "Durée courte : capital restant dû décroissant vite, exposition brève", "Chiffrer une répartition intermédiaire et laisser le couple arbitrer"], "minlen": 120, "ref": "arbitrage de quotité", "expl": ""}, {"th": "A", "kind": "open", "ask": "Un client refuse d'aborder l'hypothèse de son décès et vous demande simplement de « cocher le moins cher ». Comment conduisez-vous l'entretien ?", "model": "Je ne force pas le sujet et je ne le contourne pas non plus. Je commence par dire pourquoi je pose ces questions : la quotité engage la situation de son conjoint pendant toute la durée du prêt, et une case cochée par défaut n'est pas une décision prise. Je déplace ensuite la conversation du registre du décès vers celui du budget, qui est plus facile à aborder : je calcule devant lui ce que le survivant devrait payer chaque mois dans l'hypothèse la moins favorable, et je rapporte ce montant au revenu de son conjoint. Le chiffre parle de lui-même sans que j'aie à insister sur l'événement. Je précise que la formule la moins chère n'est pas une erreur en soi et qu'elle convient à beaucoup de situations — mais qu'il doit la choisir en sachant ce qu'elle recouvre. Enfin, je respecte son choix quel qu'il soit : mon rôle est de garantir une décision éclairée, pas de la prendre.", "points": ["Expliquer pourquoi la question se pose avant de la poser", "Déplacer du registre du décès vers celui du budget", "Chiffrer devant lui le reste à charge mensuel", "Rappeler que la formule la moins chère n'est pas une erreur", "Respecter le choix : garantir un choix éclairé, pas décider"], "minlen": 120, "ref": "posture d'entretien", "expl": ""}, {"th": "A", "kind": "open", "ask": "Deux contrats affichent le même taux de 0,30 %. Expliquez pourquoi leur coût total peut différer de plusieurs milliers d'euros.", "model": "Parce qu'un taux ne veut rien dire tant qu'on ne sait pas sur quoi il s'applique. Une prime, c'est un taux appliqué à une assiette, et il existe deux assiettes possibles. Sur le capital initial, la prime est constante pendant toute la durée du prêt : l'assuré paie chaque année sur un capital qu'il a déjà commencé à rembourser. Sur le capital restant dû, la prime décroît au fil de l'amortissement. Sur un prêt de 250 000 € sur vingt ans, le même taux de 0,30 % produit 15 000 € dans le premier cas et 8 679 € dans le second, soit 6 321 € d'écart pour une couverture identique. C'est pourquoi on ne compare jamais des taux : on compare des coûts totaux, et le TAEG les agrège. Avant toute comparaison, je vérifie donc l'assiette de calcul de chacune des deux propositions.", "points": ["Une prime = un TAUX appliqué à une ASSIETTE", "Capital initial : prime constante", "Capital restant dû : prime dégressive", "15 000 € contre 8 679 € à taux identique, soit 6 321 € d'écart", "Comparer des COÛTS TOTAUX, jamais des taux"], "minlen": 120, "ref": "assiette de calcul · lien module 3", "expl": ""}, {"th": "B", "kind": "qcm", "ask": "Un assuré est reconnu en invalidité au taux de 70 %. Quelle garantie joue, et sur quoi porte-t-elle ?", "options": ["L'IPP, avec prise en charge proportionnelle des mensualités", "L'IPT, avec remboursement du capital restant dû", "L'ITT, avec prise en charge des mensualités", "La PTIA, avec remboursement du capital restant dû"], "correct": [1], "multi": false, "expl": "Au-delà du seuil généralement retenu de 66 %, c'est l'IPT. Elle rembourse le CAPITAL RESTANT DÛ, contrairement à l'IPP et à l'ITT qui prennent en charge les mensualités. La PTIA suppose en outre l'assistance d'une tierce personne.", "ref": "les cinq garanties"}, {"th": "B", "kind": "qcm", "ask": "Un contrat prévoit une carence de douze mois et une franchise de quatre-vingt-dix jours. L'assuré est arrêté cinq mois après la signature, pour une durée de cent vingt jours. Que perçoit-il ?", "options": ["Rien : le délai de carence n'est pas écoulé", "Les mensualités à partir du 91e jour", "La totalité des mensualités de l'arrêt", "Les mensualités à partir du 121e jour"], "correct": [0], "multi": false, "expl": "La CARENCE part du CONTRAT, la FRANCHISE part du SINISTRE. L'arrêt survenant cinq mois après la signature tombe dans la carence : la franchise ne se calcule même pas.", "ref": "carence et franchise"}, {"th": "B", "kind": "qcm", "ask": "Un maçon de 40 ans vous soumet son projet de contrat. Quelles exclusions examinez-vous en priorité au regard de son métier ?", "options": ["Les maladies cardiovasculaires", "Les affections dorsales, puis les affections psychiques", "Les sports extrêmes et les séjours à l'étranger", "Les accidents de trajet"], "correct": [1], "multi": false, "expl": "Les exclusions qui comptent ne sont pas les plus spectaculaires mais celles qui portent sur ce qui arrive le plus souvent — et sur un métier physiquement exposé, l'exclusion dorsale vise précisément le risque le plus probable. Vérifier alors l'existence et la portée réelle d'un rachat d'exclusion.", "ref": "les exclusions qui comptent"}, {"th": "B", "kind": "qcm", "ask": "Un client ayant signé une rupture conventionnelle demande à faire jouer sa garantie perte d'emploi. Que lui répondez-vous ?", "options": ["Elle joue, la rupture conventionnelle y est assimilée", "Elle joue après six mois de carence", "Elle joue si le contrat est indemnitaire", "Elle ne joue généralement pas : seul le licenciement est couvert"], "correct": [3], "multi": false, "expl": "La garantie perte d'emploi ne couvre le plus souvent que le licenciement — ni la démission, ni la rupture conventionnelle, ni la fin de CDD. C'est une garantie dont le périmètre réel est très inférieur à ce que son intitulé laisse croire.", "ref": "garantie perte d'emploi"}, {"th": "B", "kind": "open", "ask": "Un client compare deux contrats affichant tous deux la mention « ITT ». Quelles lignes des conditions générales lisez-vous en priorité, et pourquoi ?", "model": "Trois lignes, parce que ce sont elles qui expliquent qu'un même sigle produise des indemnisations très différentes. La première est la définition de l'incapacité : le contrat couvre-t-il l'impossibilité d'exercer SA profession, ce qui est favorable, ou TOUTE profession, ce qui est beaucoup plus restrictif ? Un chirurgien qui perd l'usage d'une main ne peut plus opérer mais reste apte à d'autres activités : selon la définition retenue, il est indemnisé ou il ne l'est pas. La deuxième est la durée de franchise, qui court à compter du sinistre : entre quatre-vingt-dix et cent quatre-vingts jours, l'écart d'indemnisation est considérable sur un arrêt de durée moyenne. La troisième est le mode d'indemnisation, forfaitaire ou indemnitaire. Sur un même arrêt de deux cent quarante jours à 1 100 € de mensualité, ces trois lignes font passer l'indemnisation de 5 500 € à 2 200 €, puis à 1 600 €.", "points": ["Les sigles ne disent rien de ce qui sera perçu", "① La définition : sa profession ou toute profession", "② La franchise, qui court à compter du sinistre", "③ Le mode d'indemnisation : forfaitaire ou indemnitaire", "5 500 €, 2 200 € et 1 600 € sur le même sinistre"], "minlen": 120, "ref": "lire un contrat", "expl": ""}, {"th": "B", "kind": "open", "ask": "Un assuré perçoit 60 % de son salaire de son employeur pendant un arrêt de travail. Son contrat est indemnitaire et sa mensualité s'élève à 950 €. Expliquez-lui ce qu'il percevra et pourquoi.", "model": "Un contrat indemnitaire ne verse pas la mensualité : il verse la différence entre la perte de revenu réellement subie et ce qui est perçu par ailleurs. Comme son employeur lui maintient 60 % de son salaire, l'assureur ne prendra en charge que la part non couverte, et il est possible que le versement soit très inférieur à sa mensualité de 950 € — voire nul si le maintien de salaire suffit à couvrir la charge. C'est la différence avec un contrat forfaitaire, qui verse la mensualité prévue quel que soit le revenu perçu par ailleurs. Le paradoxe est qu'un assuré bien couvert par son employeur ou par un régime de prévoyance peut ne presque rien recevoir de son assurance emprunteur, alors qu'il en paie la prime. C'est un point à vérifier avant la souscription, et pas au moment du sinistre.", "points": ["Indemnitaire : seule la perte réellement subie est couverte", "Le maintien de salaire vient en déduction", "Le versement peut être très inférieur à la mensualité, voire nul", "Forfaitaire : la mensualité prévue, quel que soit le revenu perçu par ailleurs", "Un assuré bien couvert par ailleurs peut ne presque rien percevoir"], "minlen": 120, "ref": "forfaitaire ou indemnitaire", "expl": ""}, {"th": "B", "kind": "open", "ask": "Un assuré se voit proposer un rachat d'exclusion portant sur les affections dorsales. Que vérifiez-vous avant de le lui présenter comme une solution ?", "model": "Je vérifie d'abord ce que le rachat couvre réellement, car le mot laisse croire que l'exclusion disparaît alors qu'elle est parfois seulement aménagée. Certains rachats lèvent l'exclusion, d'autres la plafonnent en durée d'indemnisation, d'autres encore la maintiennent pour certaines pathologies précises. Je lis donc la clause elle-même et non son intitulé. Je regarde ensuite le surcoût qu'elle représente rapporté au coût total du contrat, et je le compare avec ce que proposerait un autre assureur sur le même profil. Je vérifie enfin la cohérence avec la situation de l'assuré : sur un métier physiquement exposé, l'exclusion dorsale porte précisément sur le risque le plus probable, et un rachat partiel n'apporte alors qu'une sécurité relative. Je présente le résultat avec les deux chiffres, sans promettre un niveau de couverture que la clause ne garantit pas.", "points": ["Le rachat ne supprime pas toujours l'exclusion", "Il peut la plafonner en durée ou la maintenir sur certaines pathologies", "Lire la clause, pas son intitulé", "Chiffrer le surcoût et le comparer à une autre proposition", "Vérifier la cohérence avec le métier exercé"], "minlen": 120, "ref": "rachat d'exclusion", "expl": ""}, {"th": "C", "kind": "qcm", "ask": "Sur un prêt de 200 000 € sur vingt ans, deux contrats affichent 0,25 %. L'un se calcule sur le capital initial, l'autre sur le capital restant dû. Lequel coûte le moins cher ?", "options": ["Le premier : la prime est constante et donc prévisible", "Les deux reviennent au même, le taux est identique", "Le second : l'assiette décroît au fil de l'amortissement", "On ne peut pas le dire sans connaître l'âge de l'assuré"], "correct": [2], "multi": false, "expl": "À taux identique, l'assiette fait toute la différence. Sur le capital restant dû, la prime décroît à mesure que le capital s'amortit ; sur le capital initial, elle reste calculée sur un capital déjà remboursé en partie.", "ref": "assiette de calcul"}, {"th": "C", "kind": "qcm", "ask": "À qui la mutualisation d'un contrat de groupe profite-t-elle ?", "options": ["Aux profils favorables, dont le tarif est allégé", "Aux profils à risque, dont le tarif est lissé", "À tous les adhérents de manière égale", "Au prêteur uniquement"], "correct": [1], "multi": false, "expl": "Le risque est réparti sur l'ensemble des adhérents et la tarification se fait par grandes tranches, le plus souvent d'âge. Les profils dégradés y sont protégés ; les profils favorables paient pour le risque des autres.", "ref": "la mutualisation"}, {"th": "C", "kind": "qcm", "ask": "Un client de 52 ans, artisan, avec un antécédent médical, obtient 1,10 % sur capital restant dû en délégation, contre 0,52 % sur capital initial en contrat de groupe, sur un prêt de 250 000 € sur vingt ans. Que lui conseillez-vous ?", "options": ["La délégation, toujours moins chère", "La délégation, dont le taux est plus protecteur", "Impossible de trancher sans connaître le TAEG", "Le contrat de groupe, moins cher dans ce cas précis"], "correct": [3], "multi": false, "expl": "31 822 € en délégation contre 26 000 € en contrat de groupe : le groupe l'emporte de 5 822 €. C'est exactement la situation où la mutualisation joue en faveur du client, et elle rappelle qu'aucune règle d'orientation ne dispense de faire chiffrer.", "ref": "quand le groupe l'emporte"}, {"th": "C", "kind": "qcm", "ask": "Sur quoi doit porter la comparaison entre deux contrats d'assurance emprunteur ?", "options": ["Sur les coûts totaux", "Sur les primes de la première année", "Sur les taux affichés", "Sur la quotité retenue"], "correct": [0], "multi": false, "expl": "On ne compare jamais des taux : deux taux identiques peuvent produire des coûts très différents selon l'assiette, et un taux plus élevé peut donner un coût plus faible. Le TAEG agrège l'ensemble.", "ref": "méthode de comparaison"}, {"th": "C", "kind": "open", "ask": "Un client vous affirme que « la délégation est toujours moins chère ». Nuancez cette affirmation en vous appuyant sur un cas où elle est fausse.", "model": "C'est vrai la plupart du temps, mais pas toujours, et présenter cette affirmation comme une règle exposerait le client à une mauvaise décision. Le contrat individuel tarife au cas par cas : âge exact, état de santé, profession, statut de fumeur. Sur un profil favorable, cette tarification fine produit des économies considérables — un cadre non-fumeur de trente et un ans peut passer de 17 000 € à 3 182 € sur le même prêt. Mais la même mécanique se retourne sur un profil dégradé, puisque l'assureur individuel facture alors le risque réel au lieu de le mutualiser. Sur un artisan de cinquante-deux ans présentant un antécédent médical, la délégation ressort à 31 822 € contre 26 000 € en contrat de groupe : le groupe l'emporte de près de six mille euros. La règle d'orientation est donc la suivante : plus le profil est favorable, plus la délégation est intéressante ; plus il est dégradé, plus le contrat de groupe protège. Et elle ne dispense jamais de faire chiffrer les deux.", "points": ["Vrai le plus souvent, faux sur les profils dégradés", "L'individuel tarife au cas par cas, dans les deux sens", "Profil favorable : 17 000 € contre 3 182 €", "Profil dégradé : 31 822 € en délégation contre 26 000 € en groupe", "La règle d'orientation ne dispense jamais de chiffrer"], "minlen": 120, "ref": "orientation groupe / individuel", "expl": ""}, {"th": "C", "kind": "open", "ask": "Expliquez à un client la différence entre une prime calculée sur le capital initial et une prime calculée sur le capital restant dû, et ce qu'il doit vérifier avant de comparer deux propositions.", "model": "Une prime d'assurance, c'est un taux appliqué à une assiette, et l'assiette n'est pas la même d'un contrat à l'autre. Calculée sur le capital initial, la prime est constante pendant toute la durée : la dernière année, il paie encore sur les 250 000 € empruntés alors qu'il n'en doit plus que quelques milliers. Calculée sur le capital restant dû, elle décroît au rythme de l'amortissement. Sur un prêt de 250 000 € sur vingt ans, un taux identique de 0,30 % produit 15 000 € dans le premier cas et 8 679 € dans le second, soit 6 321 € d'écart pour la même couverture. Ce qu'il doit vérifier avant toute comparaison, c'est donc l'assiette de chacune des deux propositions, puis le coût total sur la durée — jamais le taux affiché. J'ajoute qu'il ne faut pas associer mécaniquement le contrat de groupe au capital initial : certains contrats de groupe se calculent sur le capital restant dû, ce qui est précisément l'argument en faveur d'une vérification au cas par cas.", "points": ["Une prime = un taux appliqué à une assiette", "Capital initial : prime constante sur un capital déjà remboursé", "Capital restant dû : prime dégressive", "15 000 € contre 8 679 € à taux identique", "L'association groupe/capital initial est une tendance, pas une règle"], "minlen": 120, "ref": "assiette et comparaison", "expl": ""}, {"th": "C", "kind": "open", "ask": "Un client préfère rester au contrat de groupe alors que la délégation lui ferait économiser près de 9 000 €. Quelle est votre position ?", "model": "Ma position est de m'assurer qu'il choisit en connaissance de cause, pas de le faire changer d'avis. Mon rôle n'est pas de recommander systématiquement la délégation : il est de garantir un choix éclairé. Je vérifie donc qu'il a bien les deux éléments en main : le montant de l'économie, chiffré en coût total et non en taux, et ce qu'il obtient en contrepartie du contrat de groupe — des formalités plus simples, un interlocuteur unique, parfois une adhésion sans examen approfondi. Je m'assure aussi que la comparaison porte sur des couvertures équivalentes, car un coût plus bas ne vaut rien si les garanties sont moindres. Si, ces éléments posés, il maintient son choix, je le respecte et je le trace dans le dossier. Un client peut légitimement préférer payer davantage pour la simplicité : ce n'est pas une erreur, dès lors qu'il sait ce que cela lui coûte.", "points": ["Garantir un choix éclairé, non recommander systématiquement la délégation", "Chiffrer l'économie en coût total, pas en taux", "Nommer la contrepartie : formalités, interlocuteur unique", "Vérifier que les couvertures comparées sont équivalentes", "Respecter et tracer le choix du client"], "minlen": 120, "ref": "rôle de l'intermédiaire", "expl": ""}, {"th": "D", "kind": "qcm", "ask": "Un confrère cite l'article L. 313-30 du code de la consommation comme fondement du droit de résilier à tout moment. Où est l'erreur ?", "options": ["Il n'y a pas d'erreur, c'est bien ce texte", "Le fondement est l'article L. 113-12-2 du code des assurances ; L. 313-30 encadre la réponse du prêteur", "Le fondement est la loi Hamon du 17 mars 2014", "Le fondement est l'article L. 313-32 du code de la consommation"], "correct": [1], "multi": false, "expl": "Deux corps de règles à ne pas confondre : le code des assurances ouvre le DROIT de résilier, le code de la consommation encadre la RÉPONSE du prêteur (motivation, délais, interdiction de modifier le taux).", "ref": "chronologie et fondements"}, {"th": "D", "kind": "qcm", "ask": "Une banque refuse une délégation en indiquant seulement « garanties non équivalentes ». Ce refus est-il régulier ?", "options": ["Oui, c'est un motif suffisant", "Oui, dès lors qu'elle répond dans les dix jours ouvrés", "Non, la banque ne peut jamais refuser une délégation", "Non : le refus doit être explicite, comporter l'intégralité des motifs et préciser les garanties manquantes"], "correct": [3], "multi": false, "expl": "L'article L. 313-30 exige un refus explicite comportant l'intégralité des motifs, avec l'indication des garanties manquantes. « Ne présente pas un niveau de garantie équivalent » n'est pas un motif : c'est une conclusion.", "ref": "art. L. 313-30"}, {"th": "D", "kind": "qcm", "ask": "Une cliente de 44 ans emprunte sur dix-huit ans, pour une part assurée de 150 000 €. Bénéficie-t-elle de la dispense de questionnaire de santé ?", "options": ["Oui, la part assurée est inférieure à 200 000 €", "Non : le prêt s'achève à 62 ans, après son 60e anniversaire", "Oui, les deux conditions sont alternatives", "Non, le seuil de 200 000 € s'apprécie par prêt et non par emprunteur"], "correct": [1], "multi": false, "expl": "Les deux conditions sont CUMULATIVES. La part assurée est bien inférieure à 200 000 €, mais le remboursement intervient à 62 ans : la seconde condition fait défaut, et le questionnaire redevient exigible.", "ref": "dispense de questionnaire"}, {"th": "D", "kind": "qcm", "ask": "Après avoir accepté une délégation, la banque relève le taux nominal de 0,10 point pour compenser sa marge. Que prévoit le texte ?", "options": ["C'est possible, le contrat est renégocié", "C'est possible tant que le TAEG reste sous le taux d'usure", "L'article L. 313-32 l'interdit", "C'est possible avec l'accord écrit de l'emprunteur"], "correct": [2], "multi": false, "expl": "Sans cet article, le droit de substitution serait vidé de sa substance : la banque accepterait puis récupérerait par le taux ce qu'elle perd sur l'assurance. Ni le taux ni les conditions d'octroi, y compris le mode d'amortissement, ne peuvent être modifiés.", "ref": "art. L. 313-32"}, {"th": "D", "kind": "open", "ask": "Un client a signé son offre de prêt il y a quatre ans. Quelle fenêtre de substitution lui est ouverte aujourd'hui, et depuis quel texte ?", "model": "Il peut changer d'assurance à tout moment, sans frais ni préavis, et il n'a aucune date à respecter. C'est la loi Lemoine du 28 février 2022 qui a ouvert cette possibilité, applicable depuis le 1er juin 2022 pour les nouvelles offres et depuis le 1er septembre 2022 pour les contrats en cours — ce qui couvre son cas, son offre ayant été signée avant cette date. Auparavant, il aurait été enfermé dans un calendrier : la loi Hamon lui ouvrait les douze premiers mois, puis l'amendement Bourquin la seule date anniversaire du contrat, laquelle donnait lieu à d'interminables discussions sur la date à retenir. Ce calendrier n'existe plus. La seule condition qui demeure est l'équivalence de garanties, et elle porte sur la couverture, pas sur le prix.", "points": ["À tout moment, sans frais ni préavis", "Loi Lemoine du 28 février 2022", "En vigueur au 01/06/2022 pour les nouvelles offres, au 01/09/2022 pour les contrats en cours", "Avant : Hamon (12 premiers mois) puis Bourquin (date anniversaire)", "Seule condition restante : l'équivalence de garanties"], "minlen": 120, "ref": "chronologie du libre choix", "expl": ""}, {"th": "D", "kind": "open", "ask": "Rédigez les points que contiendrait votre courrier à une banque restée silencieuse quinze jours ouvrés après une demande de délégation.", "model": "Je rappelle d'abord les faits datés : la date d'envoi de la demande, les pièces transmises, et l'absence de réponse à ce jour. Je vise ensuite l'article L. 313-31, qui impose au prêteur de notifier sa décision dans un délai de dix jours ouvrés : ce délai est dépassé. Je vise l'article L. 313-30 pour rappeler que le prêteur ne peut refuser un contrat présentant un niveau de garantie équivalent, et que tout refus doit être explicite et comporter l'intégralité des motifs, en précisant les garanties jugées manquantes. Je vise enfin l'article L. 313-32 par anticipation, pour indiquer que l'acceptation ne peut s'accompagner d'aucune modification du taux ni des conditions d'octroi, et l'article L. 313-31 pour l'avenant à établir sous dix jours ouvrés avec mention du nouveau TAEG, sans frais. Je demande une réponse écrite sous huitaine et je conserve une copie au dossier. Je ne discute pas le fond : j'exige la motivation.", "points": ["Rappeler les faits datés et les pièces transmises", "Viser L. 313-31 : délai de dix jours ouvrés dépassé", "Viser L. 313-30 : refus explicite et intégralité des motifs", "Viser L. 313-32 : ni taux ni conditions d'octroi modifiés", "Ne pas contester le fond, exiger la motivation"], "minlen": 120, "ref": "faire respecter le droit", "expl": ""}, {"th": "D", "kind": "open", "ask": "Pourquoi la rédaction « le prêteur ne peut pas refuser » change-t-elle la portée du droit, par rapport à une rédaction du type « le prêteur peut accepter » ?", "model": "Parce qu'elle inverse la charge de la justification. Écrit « le prêteur peut accepter », le texte ferait de l'acceptation une faculté : la banque déciderait, et l'emprunteur n'aurait qu'à espérer. Écrit « le prêteur ne peut pas refuser », il fait de l'acceptation la règle et du refus l'exception, une exception qui doit être motivée, explicite, et fondée sur des critères annoncés à l'avance. C'est ce qui permet à un intermédiaire de demander sur quel critère précis le refus se fonde, et de constater que le refus tombe si aucun critère ne peut être désigné. La différence n'est donc pas rédactionnelle : elle détermine qui doit se justifier. Et c'est aussi ce qui explique qu'un client seul face à un refus laconique renonce, alors qu'un intermédiaire qui connaît la construction du texte ne renonce pas.", "points": ["L'acceptation est la règle, le refus l'exception encadrée", "La charge de la justification pèse sur le prêteur", "Le refus doit être motivé, explicite, fondé sur des critères annoncés", "Permet de demander sur quel critère le refus se fonde", "Un client seul renonce, un intermédiaire informé ne renonce pas"], "minlen": 120, "ref": "construction du texte", "expl": ""}, {"th": "E", "kind": "qcm", "ask": "Combien de critères d'équivalence une banque peut-elle opposer au maximum sur le socle décès, PTIA, invalidité et incapacité ?", "options": ["18", "11", "8", "4"], "correct": [1], "multi": false, "expl": "La liste de place en compte 18 sur le socle, mais un établissement n'en oppose que 11 au plus. Ce plafond existe pour qu'aucune banque ne puisse empiler les exigences jusqu'à rendre toute délégation impossible. Confusion la plus fréquente : le nombre de la liste et le nombre opposable.", "ref": "avis CCSF · 11 et 4"}, {"th": "E", "kind": "qcm", "ask": "Où l'emprunteur trouve-t-il les critères d'équivalence retenus par son établissement prêteur ?", "options": ["Dans la fiche standardisée d'information", "Dans la FISE", "Dans les conditions générales de son contrat d'assurance", "Dans l'avis du CCSF du 13 janvier 2015"], "correct": [0], "multi": false, "expl": "Elle est remise dès la phase de simulation et les critères sont également publiés sur le site de l'établissement. À ne pas confondre avec la FISE, qui porte sur le CRÉDIT et son TAEG. Les critères ne se devinent pas : ils sont écrits, et écrits avant la demande.", "ref": "fiche standardisée d'information"}, {"th": "E", "kind": "qcm", "ask": "Une banque refuse une substitution au motif que le tarif du contrat proposé est anormalement bas. Ce motif est-il recevable ?", "options": ["Oui, le tarif figure parmi les critères de la liste de place", "Oui, si elle l'a mentionné dans sa fiche standardisée", "Non : le taux n'est pas un critère d'équivalence", "Non, sauf pour la garantie perte d'emploi"], "correct": [2], "multi": false, "expl": "L'équivalence porte sur la COUVERTURE, jamais sur le prix. Un refus fondé sur le tarif est irrégulier, quel que soit l'écart constaté.", "ref": "le taux n'est pas un critère"}, {"th": "E", "kind": "open", "ask": "Décrivez les quatre temps de la méthode que vous appliquez avant de déposer un dossier de substitution, et dites lequel est le plus souvent sauté.", "model": "Premier temps : je récupère la fiche standardisée d'information de l'établissement et je lis les critères qu'il exige. Deuxième temps : je vérifie critère par critère, sur les conditions générales du contrat envisagé, que chacun est satisfait. Troisième temps : je traite les écarts constatés avant de déposer, en faisant ajuster le contrat — ce que permet précisément un contrat individuel, alors qu'un contrat de groupe est standardisé. Quatrième temps seulement : je dépose. Celui qui est le plus souvent sauté est le premier, et c'est le plus coûteux à omettre, parce que tout le reste en dépend : sans la fiche, on vérifie contre des critères supposés, on dépose en espérant, et on découvre les exigences réelles au moment du refus. Ce que la méthode change tient en une phrase : on ne dépose plus en espérant, on dépose en ayant vérifié.", "points": ["① Récupérer la fiche standardisée et lire les critères exigés", "② Vérifier critère par critère sur les conditions générales", "③ Traiter les écarts AVANT de déposer", "④ Déposer seulement ensuite", "Le premier est le plus souvent sauté et le plus coûteux à omettre"], "minlen": 120, "ref": "méthode de substitution", "expl": ""}, {"th": "E", "kind": "open", "ask": "Une banque oppose quatorze critères sur le socle pour justifier son refus. Que faites-vous ?", "model": "Le refus est irrégulier sur ce seul motif : un établissement ne peut opposer que onze critères au plus sur le socle, et quatre au plus sur la garantie perte d'emploi. Je vérifie d'abord ce décompte sur la fiche standardisée d'information de l'établissement, pour être certain de ce que j'avance. Je vérifie ensuite un second point, souvent plus décisif : les critères invoqués figurent-ils bien tous sur cette fiche ? Les critères retenus sont les seuls opposables, et ils ont dû être annoncés à l'avance et par écrit — une exigence ajoutée en cours de route n'est pas opposable, même si elle est raisonnable. J'écris alors à la banque en visant l'article L. 313-30, en rappelant le plafond, et en lui demandant sur quel critère de sa propre fiche le refus se fonde. Deux réponses sont possibles : soit elle désigne un critère et je sais quoi corriger, soit elle n'en désigne aucun et son refus tombe.", "points": ["Le plafond est de 11 sur le socle et 4 sur la perte d'emploi", "Vérifier le décompte sur la fiche standardisée", "Vérifier aussi que chaque critère invoqué y figure", "Les critères annoncés à l'avance sont les seuls opposables", "Demander sur quel critère de la fiche le refus se fonde"], "minlen": 120, "ref": "les deux refus irréguliers", "expl": ""}, {"th": "E", "kind": "open", "ask": "Un confrère vous dit qu'il dépose systématiquement les dossiers de substitution et « voit bien ce que la banque répond ». Expliquez-lui ce que cette méthode coûte au client.", "model": "Elle lui coûte du temps, et parfois le bénéfice de l'opération. Déposer sans avoir lu la fiche standardisée, c'est accepter de découvrir les exigences de l'établissement au moment du refus, alors qu'elles étaient publiques et disponibles avant. Chaque aller-retour ajoute des semaines pendant lesquelles le client continue de payer l'ancienne prime, et un écart qui aurait pu être corrigé en amont en faisant ajuster le contrat devient un motif de rejet. Cette méthode expose aussi le client à renoncer : un refus, même irrégulier, décourage, et beaucoup abandonnent après le premier. Enfin, elle prive l'intermédiaire de son argument le plus solide, puisqu'il ne peut pas démontrer que le refus s'écarte des critères annoncés s'il ne les a jamais lus. L'équivalence ne se discute pas, elle se vérifie — et elle se vérifie avant.", "points": ["Découvrir au refus des exigences publiques et disponibles avant", "Chaque aller-retour prolonge le paiement de l'ancienne prime", "Un écart corrigible en amont devient un motif de rejet", "Le client renonce souvent après le premier refus", "Sans la fiche, impossible de démontrer l'irrégularité du refus"], "minlen": 120, "ref": "coût de la méthode approximative", "expl": ""}, {"th": "F", "kind": "qcm", "ask": "Un client de 30 ans, non-fumeur, en poste sédentaire, paie environ 2 300 € d'assurance sur son prêt. Un autre, dans la même situation à tous égards mais âgé de 45 ans, en paie environ 5 700 €. Qu'est-ce qui explique cet écart ?", "options": ["Le montant emprunté, nécessairement plus élevé", "La profession exercée", "L'âge, premier facteur de tarification", "Le statut de fumeur"], "correct": [2], "multi": false, "expl": "Tous les autres paramètres étant identiques, seul l'âge varie — et il multiplie le coût par 2,5. C'est de loin le premier facteur. Le même écart d'âge assorti du tabagisme porterait le coût à environ 10 400 €.", "ref": "facteurs de tarification"}, {"th": "F", "kind": "qcm", "ask": "Une surprime de 100 % signifie que :", "options": ["le tarif est majoré de 100 € par an", "la couverture est limitée à 100 % du capital", "le tarif de base est doublé", "le dossier est refusé"], "correct": [2], "multi": false, "expl": "La surprime s'exprime en pourcentage du tarif de base, ou par ajout de points. Une surprime de 100 % double donc le tarif. C'est l'une des quatre réponses possibles de l'assureur, avec le tarif standard, l'exclusion et l'ajournement ou le refus.", "ref": "les quatre réponses de l'assureur"}, {"th": "F", "kind": "qcm", "ask": "Sur un prêt dont le taux nominal reste rigoureusement fixé à 3,15 %, la prime d'assurance passe de 16,67 € à 250 € par mois. Quelle en est la conséquence décisive ?", "options": ["Le taux nominal augmente mécaniquement", "Le TAEG passe de 3,37 % à 5,63 % et peut franchir le taux d'usure", "La durée du prêt doit être allongée", "La quotité doit être réduite"], "correct": [1], "multi": false, "expl": "Le taux nominal n'a pas bougé d'un centième, et le TAEG a pris plus de deux points. Or c'est le TAEG qui se compare au taux d'usure : au-delà du seuil, le prêt devient illégal. Le client peut rembourser — c'est le taux qui bloque.", "ref": "assurance et taux d'usure"}, {"th": "F", "kind": "open", "ask": "Un dossier est bloqué par le taux d'usure du seul fait de l'assurance. Citez les leviers dont vous disposez et l'ordre dans lequel vous les mobilisez.", "model": "Je commence par la délégation, parce que c'est le levier le plus puissant : un assureur individuel tarife au cas par cas et peut aboutir à un coût très inférieur à celui d'un contrat de groupe, y compris sur un profil dégradé si l'assiette est le capital restant dû. Je mobilise ensuite la convention AERAS, qui organise un examen à plusieurs niveaux et prévoit un mécanisme d'écrêtement : un refus au premier niveau n'est jamais définitif. Je vérifie en troisième lieu si la dispense de questionnaire de santé est ouverte, car sur un dossier proche des seuils — part assurée voisine de 200 000 € par emprunteur, terme voisin du soixantième anniversaire — un ajustement du montage peut tout changer. Je n'envisage la quotité qu'en dernier et avec prudence, parce que la réduire, c'est réduire une couverture, et donc déplacer le problème sur la famille. Dans tous les cas, j'aborde le sujet tôt dans le dossier, je préviens des délais, et je ne promets aucun tarif.", "points": ["① La délégation : tarification au cas par cas", "② La convention AERAS : examen à plusieurs niveaux et écrêtement", "③ La dispense de questionnaire si les deux conditions sont réunies", "④ La quotité, en dernier et avec prudence : la réduire, c'est réduire une couverture", "Aborder le sujet tôt, prévenir des délais, ne rien promettre"], "minlen": 120, "ref": "les quatre leviers", "expl": ""}, {"th": "F", "kind": "open", "ask": "Pourquoi la phrase « ne vous inquiétez pas, ça va passer » est-elle proscrite ? Que dites-vous à la place ?", "model": "Parce qu'elle promet un résultat que je ne maîtrise pas. La décision appartient à l'assureur, et sur un risque aggravé elle peut prendre la forme d'un tarif standard, d'une surprime, d'une exclusion, d'un ajournement ou d'un refus. Rassurer par avance, c'est exposer le client à une déception d'autant plus dure qu'elle porte sur sa santé, et c'est fragiliser la relation au moment précis où il aura besoin de confiance pour engager les recours. La formule juste est descriptive : un dispositif va organiser un examen approfondi de votre dossier, à plusieurs niveaux, et un refus au premier niveau n'est pas définitif. Je préviens aussi des délais, qui sont réels, et j'explique ce que nous ferons selon la réponse obtenue. Je décris une procédure, je ne prédis pas son issue.", "points": ["Elle promet un résultat qui n'appartient pas à l'intermédiaire", "Quatre réponses possibles, dont l'ajournement et le refus", "Une déception d'autant plus dure qu'elle porte sur la santé", "Formule juste : un examen approfondi va être organisé, à plusieurs niveaux", "Prévenir des délais, décrire la procédure, ne pas prédire l'issue"], "minlen": 120, "ref": "posture sur le risque aggravé", "expl": ""}, {"th": "F", "kind": "open", "ask": "Vous arrivez au terme de cette journée. Résumez la méthode que vous appliquez à tout dossier d'assurance emprunteur.", "model": "Premier réflexe : expliquer le rôle réel de l'assurance et arbitrer la quotité avec deux chiffres, le surcoût d'un côté et le reste à charge de l'autre, sans décider à la place du client. Deuxième réflexe : ne jamais m'arrêter aux sigles, et lire dans chaque contrat la définition de la garantie, la franchise et le mode d'indemnisation, parce que ce sont ces trois lignes qui déterminent ce qui sera réellement perçu. Troisième réflexe : comparer des coûts totaux et jamais des taux, en vérifiant d'abord l'assiette de calcul de chaque proposition. Quatrième réflexe : connaître le droit du client — la résiliation à tout moment, l'obligation de motivation, l'interdiction de modifier le taux — et savoir le faire respecter par écrit. Cinquième réflexe : vérifier l'équivalence de garanties avant de déposer, sur la fiche standardisée de l'établissement, et anticiper la question de la tarification en l'abordant tôt, sans rien promettre.", "points": ["① Expliquer le rôle de l'assurance et arbitrer la quotité avec deux chiffres", "② Ne jamais s'arrêter aux sigles : définition, franchise, indemnisation", "③ Comparer des COÛTS TOTAUX, jamais des taux — vérifier l'assiette", "④ Connaître le droit du client et savoir le faire respecter", "⑤ Vérifier l'équivalence AVANT de déposer · anticiper la tarification sans rien promettre"], "minlen": 120, "ref": "synthèse de la journée", "expl": ""}], "HAS_THEMES": true, "PASS": 70, "PASS_OK": "<b>Seuil atteint.</b> Vous êtes au niveau attendu sur les questions à choix de la journée 10.<br><br>Deux points de vigilance. D'une part, le pourcentage ci-dessus ne porte que sur les questions à choix : reprenez vos 18 rédactions et confrontez-les point par point aux réponses attendues affichées sous chaque énoncé — c'est là que se joue la moitié de l'épreuve. D'autre part, consultez le <b>bilan par thème</b> : un score global satisfaisant peut masquer un module faible.<br><br>Cette journée forme un tout : <b>le module 4 vous donne le droit, le module 5 la méthode</b>, et le module 6 explique pourquoi tout cela compte — un dossier peut échouer sur l'assurance seule.<br><br><b>Format de l'épreuve réelle :</b> <b>55 questions de type QCM</b> et <b>45 questions ouvertes</b>. <b>70 % de réussite</b> sont exigés pour obtenir l'examen.<br><br>Téléchargez l'attestation et déposez-la dans l'activité 360Learning.", "PASS_KO": "<b>Seuil de 70 % non atteint.</b> Ce n'est pas un échec : c'est exactement l'information dont vous aviez besoin.<br><br><b>Ce que nous vous invitons à faire, dans cet ordre :</b><ol style='margin:8px 0 0;padding-left:22px'><li>Ouvrez le <b>bilan par thème</b> ci-dessous : il désigne précisément les modules à reprendre.</li><li><b>Relisez les fiches mémo</b> des modules concernés. Chaque notion y tient en un tableau, avec les pièges signalés.</li><li>Reprenez les <b>exemples commentés</b> : ils appliquent les règles à un cas concret, ce qui les ancre bien plus durablement qu'une définition.</li><li>Refaites les <b>exercices d'entraînement</b>, qui ne sont pas notés et restent rejouables.</li><li>Repassez ensuite cette évaluation.</li></ol><br>Relisez également vos rédactions en les confrontant aux réponses attendues.<br><br><b>Format de l'épreuve réelle :</b> <b>55 questions de type QCM</b> et <b>45 questions ouvertes</b>. <b>70 % de réussite</b> sont exigés pour obtenir l'examen.<br><br>Déposez malgré tout votre attestation dans l'activité 360Learning : votre formateur verra où vous accrochez et pourra vous accompagner.", "PDF": {"header": "TMK PERFORMANCES · LES ASSURANCES EMPRUNTEURS · ÉVALUATION GLOBALE", "att_title": "Attestation — Évaluation globale", "att_sub": "Les assurances emprunteurs", "footer": "TMK Performances - N° Siret : 49841924100027 - Code NAF : 8559A", "fname": "Attestation_Assurance_emprunteur_Evaluation_globale"}};
+const THEME_INFO = CFG.THEME_INFO, THEME_ORDER = CFG.THEME_ORDER;
+const QUESTIONS = CFG.QUESTIONS, TOTAL = QUESTIONS.length, HAS_THEMES = CFG.HAS_THEMES;
+const IS_OPEN = (c)=>c.kind==="open";
+const QCM_N = QUESTIONS.filter(c=>!IS_OPEN(c)).length;
+const OPEN_N = TOTAL - QCM_N;
+const PASS = CFG.PASS, PASS_OK = CFG.PASS_OK, PASS_KO = CFG.PASS_KO;
+const PDF = CFG.PDF;
+
+const state = { nom:"", prenom:"", answers:{}, validated:false, score:0, pdfGenerated:false, dateQuiz:null };
+
+document.getElementById("nom").addEventListener("input", checkIdentity);
+document.getElementById("prenom").addEventListener("input", checkIdentity);
+function checkIdentity(){const n=document.getElementById("nom").value.trim(),p=document.getElementById("prenom").value.trim();document.getElementById("btn-start").disabled=!(n&&p);}
+
+function startQuiz(){
+  state.nom=document.getElementById("nom").value.trim().toUpperCase();
+  let p=document.getElementById("prenom").value.trim();
+  state.prenom=p.charAt(0).toUpperCase()+p.slice(1).toLowerCase();
+  state.dateQuiz=new Date();
+  const full=state.prenom+" "+state.nom;
+  document.getElementById("stagiaire-name").textContent=full;
+  document.getElementById("stagiaire-name-2").textContent=full;
+  const d=state.dateQuiz.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  document.getElementById("date-quiz").textContent=d; document.getElementById("date-quiz-2").textContent=d;
+  document.getElementById("screen-identity").style.display="none";
+  document.getElementById("screen-quiz").style.display="block";
+  if(!HAS_THEMES) document.getElementById("recap-block").style.display="none";
+  render();
+}
+
+function themeTag(c){
+  if(!c.th || !THEME_INFO[c.th]) return "";
+  return `<span class="theme-tag">${c.th} · ${THEME_INFO[c.th].label}</span>`;
+}
+
+function render(){
+  const qcm=document.getElementById("qcm"); qcm.innerHTML="";
+  QUESTIONS.forEach((c,i)=>{
+    const tag=themeTag(c);
+    let control;
+    if(IS_OPEN(c)){
+      const prev=state.answers[i]||"";
+      control=`<div class="open-tag">Question ouverte</div><textarea class="oa" data-q="${i}" rows="4" placeholder="Rédigez votre réponse, comme à l'examen — en phrases complètes.">${prev}</textarea><div class="oa-hint">Réponse attendue : ${c.minlen} caractères minimum. La réponse attendue s'affichera après validation : c'est à vous de confronter la vôtre.</div>`;
+    } else if(c.multi){
+      let boxes="";
+      c.options.forEach((o,oi)=>{boxes+=`<label data-opt="${oi}"><input type="checkbox" data-q="${i}" value="${oi}"><span>${o}</span></label>`;});
+      control=`<div class="multi-tag">Plusieurs réponses</div><div class="checks" data-q="${i}">${boxes}</div>`;
+    } else {
+      let opts='<option value="">— choisir une réponse —</option>';
+      c.options.forEach((o,oi)=>opts+=`<option value="${oi}">${o}</option>`);
+      control=`<select class="cs" data-q="${i}">${opts}</select>`;
+    }
+    qcm.innerHTML+=`<div class="cq"><div class="ask"><span class="qn">${i+1}</span><span>${c.ask}${tag}</span></div>${control}<div class="cfb" id="cfb-${i}"></div></div>`;
+  });
+  document.querySelectorAll("select.cs").forEach(s=>s.addEventListener("change",onSelect));
+  document.querySelectorAll(".checks input").forEach(s=>s.addEventListener("change",onCheck));
+  document.querySelectorAll("textarea.oa").forEach(s=>s.addEventListener("input",onOpen));
+  update();
+}
+
+function onSelect(e){ if(state.validated)return; const i=+e.currentTarget.dataset.q,v=e.currentTarget.value; if(v==="") delete state.answers[i]; else state.answers[i]=+v; update(); }
+function onCheck(e){
+  if(state.validated)return; const i=+e.currentTarget.dataset.q;
+  const checked=[...document.querySelectorAll(`.checks input[data-q="${i}"]:checked`)].map(x=>+x.value);
+  if(checked.length===0) delete state.answers[i]; else state.answers[i]=checked.sort((a,b)=>a-b);
+  update();
+}
+
+function onOpen(e){
+  if(state.validated)return; const i=+e.currentTarget.dataset.q, v=e.currentTarget.value.trim();
+  if(v.length < QUESTIONS[i].minlen) delete state.answers[i]; else state.answers[i]=e.currentTarget.value.trim();
+  update();
+}
+
+function update(){
+  const n=Object.keys(state.answers).length;
+  document.getElementById("fill").style.width=(n/TOTAL*100)+"%";
+  document.getElementById("plabel").textContent=n+" / "+TOTAL+" répondu"+(n>1?"es":"");
+  document.getElementById("btn-validate").disabled=(n!==TOTAL);
+}
+
+function isCorrect(c, ans){
+  if(IS_OPEN(c)) return null;          // non notée automatiquement
+  if(ans==null) return false;
+  if(c.multi){
+    const a=[...ans].sort((x,y)=>x-y).join(","), g=[...c.correct].sort((x,y)=>x-y).join(",");
+    return a===g;
+  }
+  return ans===c.correct[0];
+}
+function answerLabel(c, ans){
+  if(ans==null) return "—";
+  if(c.multi) return ans.map(i=>c.options[i]).join(" ; ");
+  return c.options[ans];
+}
+function correctLabel(c){
+  return c.correct.map(i=>c.options[i]).join(" ; ");
+}
+
+function themeStats(){
+  const st={}; THEME_ORDER.forEach(t=>st[t]={ok:0,total:0});
+  QUESTIONS.forEach((c,i)=>{ if(IS_OPEN(c)||!st[c.th])return; st[c.th].total++; if(isCorrect(c,state.answers[i])) st[c.th].ok++; });
+  return st;
+}
+
+function validateQuiz(){
+  if(state.validated)return; state.validated=true;
+  let score=0;
+  QUESTIONS.forEach((c,i)=>{
+    const ans=state.answers[i], ok=isCorrect(c,ans); if(ok)score++;
+    if(IS_OPEN(c)){
+      const ta=document.querySelector(`textarea.oa[data-q="${i}"]`); ta.disabled=true;
+      const pts=(c.points&&c.points.length)?`<ul>${c.points.map(x=>`<li>${x}</li>`).join("")}</ul>`:"";
+      const rf=c.ref?`<p class="ref">${c.ref}</p>`:"";
+      const f0=document.getElementById("cfb-"+i);
+      f0.className="cfb good";
+      f0.innerHTML=`<div class="model"><h5>La réponse attendue</h5><p>${c.model}</p>${pts}${rf}<p class="note">Cette question n'est pas notée automatiquement : confrontez votre rédaction à la réponse attendue. Votre texte et la réponse attendue figurent tous deux dans votre attestation PDF.</p></div>`;
+      requestAnimationFrame(()=>f0.classList.add("show"));
+      return;
+    }
+    if(c.multi){
+      const cont=document.querySelector(`.checks[data-q="${i}"]`);
+      cont.querySelectorAll("input").forEach(x=>x.disabled=true);
+      c.correct.forEach(g=>cont.querySelector(`label[data-opt="${g}"]`).classList.add("ok"));
+      (ans||[]).forEach(a=>{ if(!c.correct.includes(a)) cont.querySelector(`label[data-opt="${a}"]`).classList.add("ko"); });
+    } else {
+      const sel=document.querySelector(`select.cs[data-q="${i}"]`); sel.disabled=true;
+      sel.classList.add(ok?"ok":"ko");
+    }
+    const f=document.getElementById("cfb-"+i);
+    f.className="cfb "+(ok?"good":"bad");
+    const vd=ok?"Exact.":((c.multi?"Bonnes réponses : ":"Bonne réponse : ")+correctLabel(c)+".");
+    const refLine=c.ref?`<br><span class="ref">${c.ref}</span>`:"";
+    f.innerHTML=`<span class="vd">${vd}</span> ${c.expl}${refLine}`;
+    requestAnimationFrame(()=>f.classList.add("show"));
+  });
+  state.score=score;
+  document.getElementById("score").textContent=score;
+  document.getElementById("btn-validate").disabled=true;
+  generatePDF();
+  showResults();
+}
+
+function showResults(){
+  const pct=Math.round(state.score/QCM_N*100);
+  document.getElementById("screen-result").style.display="block";
+  document.getElementById("score-value").textContent=state.score+"/"+QCM_N;
+  const sl=document.getElementById("score-label"); if(sl) sl.textContent = OPEN_N ? "questions à choix" : "questions";
+  const c=document.getElementById("score-circle"),m=document.getElementById("result-message"),d=document.getElementById("result-detail");
+  const suffix = OPEN_N ? " Vos "+OPEN_N+" question"+(OPEN_N>1?"s":"")+" ouverte"+(OPEN_N>1?"s ne sont":" n'est")+" pas notée"+(OPEN_N>1?"s":"")+" : confrontez votre rédaction à la réponse attendue, affichée sous chacune." : "";
+  c.className="score-circle";
+  if(PASS){
+    const ok = pct>=PASS;
+    c.classList.add(ok?(pct>=90?"excellent":"good"):(pct>=50?"average":"poor"));
+    m.textContent = ok ? "Objectif atteint" : "Objectif non atteint";
+    d.textContent = (ok?"Vous êtes au-dessus du seuil de "+PASS+" %.":"Vous êtes en dessous du seuil de "+PASS+" %.")+suffix;
+    const b=document.getElementById("pass-banner");
+    b.className="pass-banner "+(ok?"ok":"ko");
+    b.innerHTML = ok
+      ? `<b>Réussite — ${pct} % de bonnes réponses</b>${PASS_OK||"Vous avez atteint le seuil de "+PASS+" %. Les acquis de la journée sont consolidés : vous pouvez aborder la suite du parcours."}`
+      : `<b>Seuil non atteint — ${pct} % de bonnes réponses</b>${PASS_KO||"Le seuil de réussite est fixé à "+PASS+" %. Reprenez les fiches mémo et les séquences des thèmes en rouge, puis <strong>refaites ce QCM afin de vous entraîner</strong> : c'est en le repassant que les automatismes s'installent."}`;
+    b.style.display="block";
+  }
+  else if(pct>=90){c.classList.add("excellent");m.textContent="Évaluation validée — Excellent !";d.textContent="Vous maîtrisez l'ensemble des notions du module."+suffix;}
+  else if(pct>=70){c.classList.add("good");m.textContent="Évaluation validée";d.textContent="Bon niveau global. Le détail commenté de vos réponses figure ci-dessus."+suffix;}
+  else if(pct>=50){c.classList.add("average");m.textContent="Presque — à consolider";d.textContent="Acquis partiels. Le détail commenté de chaque réponse figure ci-dessus."+suffix;}
+  else{c.classList.add("poor");m.textContent="À retravailler";d.textContent="Le détail commenté reprend la bonne réponse et l'explication de chaque question."+suffix;}
+
+  if(HAS_THEMES){
+    const st=themeStats(); let html="";
+    THEME_ORDER.forEach(t=>{
+      const s=st[t]; if(!s||s.total===0) return;
+      const full=(s.ok===s.total);
+      const color=full?"var(--ok)":(s.ok===0?"var(--ko)":"var(--amber)");
+      html+=`<div class="recap-row"><span class="dot" style="background:${color}"></span><span class="lab">${t} · ${THEME_INFO[t].label}</span><span class="sc">${s.ok} / ${s.total}</span></div>`;
+    });
+    document.getElementById("recap-list").innerHTML=html;
+  }
+  const np=document.getElementById("note-pdf");
+  if(state.pdfGenerated){np.textContent="✓ Votre attestation PDF a été générée et téléchargée pour cette session. Vous pouvez refaire l'évaluation, mais aucun nouveau PDF ne sera généré.";np.style.display="block";}
+  document.getElementById("screen-result").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+function restartQuiz(){
+  state.answers={};state.validated=false;state.score=0;state.dateQuiz=new Date();
+  const d=state.dateQuiz.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  document.getElementById("date-quiz").textContent=d;document.getElementById("date-quiz-2").textContent=d;
+  document.getElementById("score").textContent="—";
+  const bv=document.getElementById("btn-validate");
+  if(state.pdfGenerated) bv.textContent="Valider l'évaluation";
+  document.getElementById("note-pdf").style.display="none";
+  const pb=document.getElementById("pass-banner"); if(pb) pb.style.display="none";
+  document.getElementById("screen-result").style.display="none";
+  render(); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ───────── PDF (attestation) ───────── */
+function generatePDF(){
+  if(state.pdfGenerated)return;
+  if(!window.jspdf||!window.jspdf.jsPDF){return;}
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  const pageW=doc.internal.pageSize.getWidth(), pageH=doc.internal.pageSize.getHeight();
+  const margin=18; let y=0;
+  const NAVY=[22,36,59],BLUE=[31,78,121],OKC=[47,122,79],KOC=[178,59,59],AMB=[181,133,42];
+  const footer=()=>{const tp=doc.internal.getNumberOfPages();for(let i=1;i<=tp;i++){doc.setPage(i);doc.setFont("helvetica","italic");doc.setFontSize(8);doc.setTextColor(150,150,150);doc.text(`Page ${i} / ${tp}  —  ${PDF.footer}`,pageW/2,pageH-8,{align:"center"});}};
+  const ensure=(h)=>{if(y+h>pageH-18){doc.addPage();y=margin;}};
+
+  doc.setFillColor(...NAVY);doc.rect(0,0,pageW,38,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(9);
+  doc.text(PDF.header,margin,13);
+  doc.setFontSize(15);doc.text(PDF.att_title,margin,24);
+  doc.setFont("helvetica","normal");doc.setFontSize(10);
+  doc.text(PDF.att_sub,margin,32);
+  y=50;
+
+  doc.setFillColor(239,234,223);doc.rect(margin,y,pageW-2*margin,26,"F");
+  doc.setTextColor(...BLUE);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Stagiaire",margin+4,y+7);
+  doc.setFont("helvetica","normal");doc.setTextColor(40,40,40);doc.setFontSize(12);doc.text(`${state.prenom} ${state.nom}`,margin+4,y+15);
+  doc.setFontSize(9);doc.setTextColor(100,100,100);
+  const dS=state.dateQuiz.toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  const tS=state.dateQuiz.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  doc.text(`Évaluation réalisée le ${dS} à ${tS}`,margin+4,y+22);
+  y+=36;
+
+  const pct=Math.round(state.score/QCM_N*100);
+  let col=KOC,lab="À retravailler";
+  if(PASS){ const ok=pct>=PASS; col=ok?OKC:AMB; lab=ok?"Réussite":"Seuil non atteint"; }
+  else if(pct>=90){col=OKC;lab="Excellent";}else if(pct>=70){col=BLUE;lab="Validé";}else if(pct>=50){col=AMB;lab="À consolider";}
+  doc.setFillColor(...col);doc.rect(margin,y,pageW-2*margin,28,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(22);doc.text(`${state.score} / ${QCM_N}`,margin+6,y+13);
+  doc.setFontSize(11);doc.text(`(${pct}%)  —  questions à choix`,margin+6,y+22);
+  doc.setFontSize(13);doc.text(lab,pageW-margin-6,y+17,{align:"right"});
+  y+=34;
+
+  if(PASS){
+    const ok=pct>=PASS;
+    const msg = ok ? `Seuil de reussite : ${PASS} %. Objectif atteint.`
+                   : `Seuil de reussite : ${PASS} %. Objectif non atteint : refaites ce QCM afin de vous entrainer.`;
+    doc.setFont("helvetica","italic");doc.setFontSize(9);doc.setTextColor(...(ok?OKC:AMB));
+    doc.text(msg,margin,y+2); y+=8;
+  }
+  if(OPEN_N){
+    doc.setFont("helvetica","italic");doc.setFontSize(8.5);doc.setTextColor(120,120,120);
+    doc.text(`${OPEN_N} question(s) ouverte(s) : non notees automatiquement — voir la section dediee en fin de document.`,margin,y+2);
+    y+=8;
+  }
+  y+=2;
+
+  if(HAS_THEMES){
+    const st=themeStats();
+    doc.setFillColor(...NAVY);doc.rect(margin,y,pageW-2*margin,9,"F");
+    doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Bilan par thème",margin+4,y+6.2);y+=12;
+    THEME_ORDER.forEach(t=>{
+      const s=st[t]; if(!s||s.total===0) return;
+      const full=(s.ok===s.total); const cc=full?OKC:(s.ok===0?KOC:AMB);
+      ensure(7);
+      doc.setFillColor(...cc);doc.circle(margin+3,y-0.5,1.4,"F");
+      doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.setTextColor(55,55,55);
+      doc.text(`${t} · ${THEME_INFO[t].label}`,margin+8,y);
+      doc.setFont("helvetica","bold");doc.text(`${s.ok} / ${s.total}`,margin+92,y);
+      y+=6.5;
+    });
+    y+=4;
+  }
+
+  doc.setFillColor(...NAVY);doc.rect(margin,y,pageW-2*margin,9,"F");
+  doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Détail des réponses",margin+4,y+6.2);
+  doc.setFontSize(9);doc.text(`${QCM_N} question${QCM_N>1?"s":""} à choix`,pageW-margin-4,y+6.2,{align:"right"});y+=12;
+
+  QUESTIONS.forEach((c,i)=>{
+    if(IS_OPEN(c)) return;
+    const ans=state.answers[i], ok=isCorrect(c,ans);
+    const head=(c.th?`[${c.th}] `:"")+c.ask;
+    const qLines=doc.splitTextToSize(`${i+1}. ${head}`,pageW-2*margin-16);
+    const yLines=doc.splitTextToSize(`Votre réponse : ${answerLabel(c,ans)}`,pageW-2*margin-10);
+    const gLines=doc.splitTextToSize(`${c.multi?"Bonnes réponses":"Bonne réponse"} : ${correctLabel(c)}`,pageW-2*margin-10);
+    const eLines=doc.splitTextToSize(c.expl+(c.ref?"  ("+c.ref+")":""),pageW-2*margin-10);
+    const h=6+qLines.length*4+4+yLines.length*4+gLines.length*4+4+eLines.length*4+6;
+    ensure(h);
+    doc.setFillColor(ok?OKC[0]:KOC[0],ok?OKC[1]:KOC[1],ok?OKC[2]:KOC[2]);doc.rect(margin,y,2,h-3,"F");
+    doc.setFont("helvetica","bold");doc.setFontSize(9.5);doc.setTextColor(ok?OKC[0]:KOC[0],ok?OKC[1]:KOC[1],ok?OKC[2]:KOC[2]);doc.text(ok?"[OK]":"[X]",margin+5,y+5);
+    doc.setTextColor(55,55,55);doc.text(qLines,margin+16,y+5);
+    let yy=y+5+qLines.length*4+2;
+    doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(100,100,100);doc.text(yLines,margin+5,yy);yy+=yLines.length*4;
+    doc.setTextColor(40,100,60);doc.text(gLines,margin+5,yy);yy+=gLines.length*4+1;
+    doc.setFont("helvetica","italic");doc.setFontSize(8.5);doc.setTextColor(90,90,90);doc.text(eLines,margin+5,yy);
+    y+=h;
+  });
+
+  if(OPEN_N){
+    ensure(20);
+    doc.setFillColor(...NAVY);doc.rect(margin,y,pageW-2*margin,9,"F");
+    doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(11);doc.text("Questions ouvertes — votre rédaction et la réponse attendue",margin+4,y+6.2);
+    doc.setFontSize(9);doc.text(`${OPEN_N} question${OPEN_N>1?"s":""}`,pageW-margin-4,y+6.2,{align:"right"});y+=12;
+    doc.setFont("helvetica","italic");doc.setFontSize(8.5);doc.setTextColor(120,120,120);
+    const iL=doc.splitTextToSize("Ces questions ne sont pas notees automatiquement : aucune correction de texte libre ne serait fiable. Confrontez votre redaction a la reponse attendue, et sollicitez votre referent pedagogique en cas de doute.",pageW-2*margin);
+    doc.text(iL,margin,y); y+=iL.length*4+4;
+
+    let n=0;
+    QUESTIONS.forEach((c,i)=>{
+      if(!IS_OPEN(c)) return; n++;
+      const mine=(state.answers[i]||"— non renseignée —");
+      const qLines=doc.splitTextToSize(`${n}. ${(c.th?`[${c.th}] `:"")+c.ask}`,pageW-2*margin-10);
+      const aLines=doc.splitTextToSize(mine,pageW-2*margin-14);
+      const mLines=doc.splitTextToSize(c.model,pageW-2*margin-14);
+      const pLines=(c.points||[]).map(x=>doc.splitTextToSize("- "+x,pageW-2*margin-16)).flat();
+      const h=6+qLines.length*4+6+aLines.length*4+6+mLines.length*4+pLines.length*4+(c.ref?5:0)+8;
+      ensure(Math.min(h,pageH-2*margin));
+      doc.setFillColor(...BLUE);doc.rect(margin,y,2,Math.min(h-3,pageH-y-20),"F");
+      doc.setFont("helvetica","bold");doc.setFontSize(9.5);doc.setTextColor(55,55,55);
+      doc.text(qLines,margin+6,y+5); let yy=y+5+qLines.length*4+3;
+      doc.setFont("helvetica","bold");doc.setFontSize(8.5);doc.setTextColor(100,100,100);doc.text("Votre reponse :",margin+6,yy);yy+=4;
+      doc.setFont("helvetica","normal");doc.setTextColor(60,60,60);
+      aLines.forEach(l=>{ensure(5);doc.text(l,margin+10,yy);yy+=4;});
+      yy+=3;
+      doc.setFont("helvetica","bold");doc.setTextColor(40,100,60);ensure(5);doc.text("Reponse attendue :",margin+6,yy);yy+=4;
+      doc.setFont("helvetica","normal");doc.setTextColor(60,80,65);
+      mLines.forEach(l=>{ensure(5);doc.text(l,margin+10,yy);yy+=4;});
+      pLines.forEach(l=>{ensure(5);doc.text(l,margin+12,yy);yy+=4;});
+      if(c.ref){doc.setFont("helvetica","italic");doc.setTextColor(150,120,80);ensure(5);doc.text(c.ref,margin+10,yy+1);yy+=5;}
+      y=yy+6;
+    });
+  }
+
+  footer();
+  const safe=(s)=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9]/g,"_");
+  const df=state.dateQuiz.toISOString().slice(0,10);
+  doc.save(`${PDF.fname}_${safe(state.nom)}_${safe(state.prenom)}_${df}.pdf`);
+
+  state.pdfGenerated=true;
+}
+</script>
+
+<script>
+(function(){
+  function libre(e){ var t=e.target; return t && (t.tagName==='TEXTAREA'||t.tagName==='INPUT'); }
+  ['copy','cut','contextmenu','dragstart'].forEach(function(ev){
+    document.addEventListener(ev,function(e){ if(!libre(e)) e.preventDefault(); });
+  });
+  document.addEventListener('keydown',function(e){
+    if(libre(e)) return;
+    var k=(e.key||'').toLowerCase();
+    if((e.ctrlKey||e.metaKey) && ['c','x','a','s','p','u'].indexOf(k)>-1) e.preventDefault();
+  });
+})();
+</script>
+</body>
+</html>
